@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>月眠云朵 - 可直接预览版</title>
+  <style>
+    :root {
+      --night: #111735;
+      --night-2: #1b2350;
+      --violet: #a994ff;
+      --violet-soft: #ded6ff;
+      --mint: #8ee6d1;
+      --star: #f8d879;
+      --pink: #ffb7d5;
+      --cream: #fff6df;
+      --white: #f9fbff;
+      --muted: #bac3e6;
+      --glass: rgba(255, 255, 255, 0.12);
+      font-family: "HarmonyOS Sans", "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 20% 18%, rgba(142, 230, 209, 0.18), transparent 26%),
+        radial-gradient(circle at 78% 24%, rgba(248, 216, 121, 0.16), transparent 22%),
+        linear-gradient(145deg, #0b102a 0%, #171b3e 45%, #25205a 100%);
+    }
+
+    button { font: inherit; }
+
+    .app-shell {
+      width: min(100%, 440px);
+      padding: 24px;
+    }
+
+    .phone-frame {
+      position: relative;
+      min-height: 900px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 34px;
+      padding: 22px 22px 98px;
+      background:
+        linear-gradient(180deg, rgba(27, 35, 80, 0.92) 0%, rgba(17, 23, 53, 0.96) 52%, #121735 100%);
+      box-shadow: 0 34px 80px rgba(0, 0, 0, 0.38);
+    }
+
+    .sky {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow: 0 0 18px rgba(248, 216, 121, 0.78);
+      animation: twinkle 3.4s ease-in-out infinite;
+    }
+
+    .star-a { left: 62px; top: 92px; }
+    .star-b { right: 54px; top: 168px; animation-delay: 0.8s; }
+    .star-c { left: 34px; top: 410px; animation-delay: 1.5s; }
+    .star-d { right: 82px; top: 512px; animation-delay: 0.4s; }
+
+    .moon {
+      position: absolute;
+      right: 44px;
+      top: 72px;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow: 0 0 34px rgba(248, 216, 121, 0.42);
+    }
+
+    .moon::after {
+      content: "";
+      position: absolute;
+      right: -6px;
+      top: -5px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #1b2350;
+    }
+
+    .home-header,
+    .home-hero,
+    .home-metrics,
+    .home-actions,
+    .last-night,
+    .bottom-nav {
+      position: relative;
+      z-index: 1;
+    }
+
+    .home-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .eyebrow {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    h1 {
+      max-width: 276px;
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.16;
+      letter-spacing: 0;
+    }
+
+    .icon-button {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 16px;
+      background: var(--glass);
+      color: var(--white);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+
+    .bell::before {
+      content: "";
+      width: 16px;
+      height: 17px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+      border-radius: 11px 11px 6px 6px;
+    }
+
+    .bell::after {
+      content: "";
+      width: 6px;
+      height: 6px;
+      margin-top: -12px;
+      border-radius: 50%;
+      background: var(--star);
+    }
+
+    .home-hero {
+      display: grid;
+      grid-template-columns: 132px 1fr;
+      align-items: center;
+      gap: 12px;
+      margin-top: 28px;
+    }
+
+    .mini-cloud {
+      position: relative;
+      --cloud-scale: 0.58;
+      width: 238px;
+      height: 174px;
+      transform-origin: left center;
+      animation: floaty-mini 4.8s ease-in-out infinite;
+    }
+
+    .cloud-puff {
+      position: absolute;
+      background: linear-gradient(180deg, #ffffff 0%, #e9ecff 100%);
+      box-shadow: inset -10px -12px 22px rgba(155, 169, 227, 0.18);
+    }
+
+    .puff-one {
+      left: 18px;
+      bottom: 30px;
+      width: 96px;
+      height: 86px;
+      border-radius: 52px;
+    }
+
+    .puff-two {
+      left: 70px;
+      bottom: 42px;
+      width: 112px;
+      height: 112px;
+      border-radius: 60px;
+    }
+
+    .puff-three {
+      right: 18px;
+      bottom: 28px;
+      width: 100px;
+      height: 88px;
+      border-radius: 52px;
+    }
+
+    .puff-four {
+      left: 42px;
+      bottom: 12px;
+      width: 156px;
+      height: 72px;
+      border-radius: 44px;
+    }
+
+    .sleep-cap {
+      position: absolute;
+      left: 76px;
+      top: 6px;
+      width: 78px;
+      height: 58px;
+      z-index: 3;
+      border-radius: 54px 54px 10px 54px;
+      background: linear-gradient(145deg, #a994ff, #7f70df);
+      transform: rotate(-16deg);
+    }
+
+    .sleep-cap::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      bottom: 0;
+      width: 80px;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--cream);
+    }
+
+    .sleep-cap::after {
+      content: "";
+      position: absolute;
+      right: -12px;
+      top: -5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow: 0 0 14px rgba(248, 216, 121, 0.45);
+    }
+
+    .face {
+      position: absolute;
+      z-index: 5;
+      top: 91px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4c5078;
+    }
+
+    .eye-left { left: 88px; }
+    .eye-right { right: 90px; }
+
+    .blush {
+      position: absolute;
+      z-index: 4;
+      top: 112px;
+      width: 26px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(255, 183, 213, 0.72);
+    }
+
+    .blush-left { left: 55px; }
+    .blush-right { right: 58px; }
+
+    .mouth {
+      position: absolute;
+      z-index: 5;
+      left: 111px;
+      top: 107px;
+      width: 18px;
+      height: 10px;
+      border-bottom: 3px solid #666b98;
+      border-radius: 0 0 18px 18px;
+    }
+
+    .pillow {
+      position: absolute;
+      z-index: 6;
+      left: 54px;
+      bottom: 2px;
+      width: 136px;
+      height: 54px;
+      border-radius: 26px;
+      background: linear-gradient(145deg, #fff6df, #f5dba4);
+      box-shadow: inset -8px -10px 18px rgba(189, 142, 77, 0.16), 0 14px 26px rgba(16, 20, 48, 0.18);
+      transform: rotate(-3deg);
+    }
+
+    .pillow::before,
+    .pillow::after {
+      content: "";
+      position: absolute;
+      top: 14px;
+      width: 14px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.46);
+    }
+
+    .pillow::before { left: 11px; }
+    .pillow::after { right: 11px; }
+
+    .arm {
+      position: absolute;
+      z-index: 7;
+      bottom: 43px;
+      width: 46px;
+      height: 20px;
+      border-radius: 999px;
+      background: #eef1ff;
+    }
+
+    .arm-left {
+      left: 42px;
+      transform: rotate(21deg);
+    }
+
+    .arm-right {
+      right: 44px;
+      transform: rotate(-21deg);
+    }
+
+    .advice-card {
+      min-height: 146px;
+      padding: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 22px;
+      background:
+        linear-gradient(160deg, rgba(169, 148, 255, 0.28), rgba(142, 230, 209, 0.1)),
+        var(--glass);
+      backdrop-filter: blur(18px);
+    }
+
+    .advice-card span,
+    .metric-card span,
+    .metric-card small,
+    .section-title span,
+    .home-action small,
+    .report-strip span {
+      color: var(--muted);
+    }
+
+    .advice-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 20px;
+      line-height: 1.28;
+    }
+
+    .advice-card p {
+      margin: 10px 0 0;
+      color: #dce3ff;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .home-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .metric-card {
+      min-height: 106px;
+      display: grid;
+      align-content: center;
+      gap: 7px;
+      padding: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.09);
+      backdrop-filter: blur(16px);
+    }
+
+    .metric-card.large {
+      grid-column: span 2;
+      min-height: 118px;
+      background:
+        radial-gradient(circle at 88% 25%, rgba(248, 216, 121, 0.28), transparent 34%),
+        rgba(255, 255, 255, 0.12);
+    }
+
+    .metric-card strong {
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .metric-card:not(.large) strong {
+      font-size: 23px;
+    }
+
+    .home-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .home-action {
+      min-height: 104px;
+      display: grid;
+      align-content: center;
+      justify-items: start;
+      gap: 7px;
+      padding: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+    }
+
+    .home-action.active,
+    .home-action:hover {
+      transform: translateY(-2px);
+      border-color: rgba(248, 216, 121, 0.68);
+      background: rgba(248, 216, 121, 0.14);
+    }
+
+    .icon,
+    .home-action-icon {
+      width: 34px;
+      height: 34px;
+      position: relative;
+      display: block;
+    }
+
+    .home-action-icon.start {
+      border-radius: 50%;
+      background: var(--star);
+      box-shadow: 0 0 18px rgba(248, 216, 121, 0.34);
+    }
+
+    .home-action-icon.start::before {
+      content: "";
+      position: absolute;
+      left: 13px;
+      top: 9px;
+      width: 0;
+      height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 11px solid #222757;
+    }
+
+    .rain {
+      border-radius: 50% 50% 42% 42%;
+      background: var(--mint);
+    }
+
+    .rain::before {
+      content: "";
+      position: absolute;
+      left: 7px;
+      top: 24px;
+      width: 4px;
+      height: 14px;
+      border-radius: 999px;
+      background: #d9fff6;
+      box-shadow: 9px 4px 0 #d9fff6, 18px -1px 0 #d9fff6;
+    }
+
+    .breath {
+      border: 2px solid var(--violet-soft);
+      border-radius: 50%;
+    }
+
+    .breath::before {
+      content: "";
+      position: absolute;
+      inset: 7px;
+      border-radius: 50%;
+      background: var(--violet);
+    }
+
+    .story {
+      border-radius: 8px 15px 15px 8px;
+      background: var(--star);
+    }
+
+    .story::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 7px;
+      width: 3px;
+      height: 21px;
+      border-radius: 999px;
+      background: rgba(82, 67, 122, 0.38);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .section-title strong {
+      font-size: 18px;
+    }
+
+    .section-title span {
+      font-size: 13px;
+    }
+
+    .report-strip {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 20px;
+      padding: 14px;
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+    }
+
+    .report-strip article {
+      display: grid;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .report-strip strong {
+      font-size: 17px;
+    }
+
+    .bottom-nav {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-radius: 24px;
+      background: rgba(17, 23, 53, 0.82);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    }
+
+    .nav-item {
+      min-width: 0;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      gap: 4px;
+      border: 0;
+      border-radius: 17px;
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: #24284f;
+      background: linear-gradient(135deg, var(--star), #fff0ad);
+    }
+
+    .nav-item strong {
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .nav-icon {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      display: block;
+    }
+
+    .nav-icon.home::before {
+      content: "";
+      position: absolute;
+      inset: 4px 3px 2px;
+      border: 2px solid currentColor;
+      border-top: 0;
+      border-radius: 3px;
+    }
+
+    .nav-icon.home::after {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 2px;
+      width: 12px;
+      height: 12px;
+      border-left: 2px solid currentColor;
+      border-top: 2px solid currentColor;
+      transform: rotate(45deg);
+    }
+
+    .nav-icon.relax {
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .nav-icon.relax::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .nav-icon.report::before {
+      content: "";
+      position: absolute;
+      bottom: 2px;
+      left: 4px;
+      width: 4px;
+      height: 10px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 6px -5px 0 currentColor, 12px -1px 0 currentColor;
+    }
+
+    .nav-icon.profile {
+      border: 2px solid currentColor;
+      border-radius: 50%;
+    }
+
+    .nav-icon.profile::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .nav-icon.profile::after {
+      content: "";
+      position: absolute;
+      left: 3px;
+      bottom: 2px;
+      width: 10px;
+      height: 5px;
+      border-radius: 10px 10px 0 0;
+      background: currentColor;
+    }
+
+    @keyframes floaty-mini {
+      0%, 100% { transform: translateY(0) rotate(-1deg) scale(var(--cloud-scale)); }
+      50% { transform: translateY(-8px) rotate(1deg) scale(var(--cloud-scale)); }
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.35; transform: scale(0.82); }
+      50% { opacity: 1; transform: scale(1.22); }
+    }
+
+    @media (max-width: 430px) {
+      .app-shell {
+        padding: 0;
+      }
+
+      .phone-frame {
+        min-height: 100vh;
+        border: 0;
+        border-radius: 0;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      .home-hero {
+        grid-template-columns: 112px 1fr;
+      }
+
+      .mini-cloud {
+        --cloud-scale: 0.5;
+      }
+
+      .advice-card {
+        padding: 16px;
+      }
+
+      .metric-card strong {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="phone-frame" aria-label="月眠云朵 APP 首页">
+      <div class="sky" aria-hidden="true">
+        <span class="star star-a"></span>
+        <span class="star star-b"></span>
+        <span class="star star-c"></span>
+        <span class="star star-d"></span>
+        <span class="moon"></span>
+      </div>
+
+      <header class="home-header">
+        <div>
+          <p class="eyebrow">5 月 20 日 星期三</p>
+          <h1>晚上好，准备慢慢安静下来</h1>
+        </div>
+        <button class="icon-button bell" aria-label="睡前提醒"></button>
+      </header>
+
+      <section class="home-hero">
+        <div class="mini-cloud" role="img" aria-label="抱着枕头的小云朵">
+          <span class="sleep-cap"></span>
+          <span class="cloud-puff puff-one"></span>
+          <span class="cloud-puff puff-two"></span>
+          <span class="cloud-puff puff-three"></span>
+          <span class="cloud-puff puff-four"></span>
+          <span class="face eye-left"></span>
+          <span class="face eye-right"></span>
+          <span class="blush blush-left"></span>
+          <span class="blush blush-right"></span>
+          <span class="mouth"></span>
+          <span class="arm arm-left"></span>
+          <span class="arm arm-right"></span>
+          <span class="pillow"></span>
+        </div>
+        <article class="advice-card">
+          <span>今晚建议</span>
+          <strong id="homeStatusTitle">22:45 前开始放松</strong>
+          <p id="homeStatusText">云朵已经为你准备好雨声和 3 分钟呼吸练习。</p>
+        </article>
+      </section>
+
+      <section class="home-metrics" aria-label="今晚睡眠核心数据">
+        <article class="metric-card large">
+          <span>建议入睡</span>
+          <strong>23:15</strong>
+          <small>比昨晚提前 18 分钟</small>
+        </article>
+        <article class="metric-card">
+          <span>目标</span>
+          <strong>7h 45m</strong>
+          <small>稳定作息</small>
+        </article>
+        <article class="metric-card">
+          <span>放松进度</span>
+          <strong>62%</strong>
+          <small>还差一步</small>
+        </article>
+      </section>
+
+      <section class="home-actions" aria-label="快捷功能入口">
+        <button class="home-action active" data-home-mode="sleep">
+          <span class="home-action-icon start"></span>
+          <strong>开始睡眠</strong>
+          <small>进入陪睡页</small>
+        </button>
+        <button class="home-action" data-home-mode="noise">
+          <span class="icon rain"></span>
+          <strong>白噪音</strong>
+          <small>雨声与海浪</small>
+        </button>
+        <button class="home-action" data-home-mode="breath">
+          <span class="icon breath"></span>
+          <strong>呼吸放松</strong>
+          <small>3 分钟</small>
+        </button>
+        <button class="home-action" data-home-mode="story">
+          <span class="icon story"></span>
+          <strong>睡眠故事</strong>
+          <small>云上小屋</small>
+        </button>
+      </section>
+
+      <section class="last-night">
+        <div class="section-title">
+          <strong>昨晚睡眠</strong>
+          <span>比前一晚更稳定</span>
+        </div>
+        <div class="report-strip" aria-label="昨晚睡眠摘要">
+          <article>
+            <span>总时长</span>
+            <strong>7h 28m</strong>
+          </article>
+          <article>
+            <span>评分</span>
+            <strong>91</strong>
+          </article>
+          <article>
+            <span>深睡</span>
+            <strong>2h 16m</strong>
+          </article>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" aria-label="底部导航">
+        <button class="nav-item active" aria-label="首页">
+          <span class="nav-icon home"></span>
+          <strong>首页</strong>
+        </button>
+        <button class="nav-item" aria-label="放松">
+          <span class="nav-icon relax"></span>
+          <strong>放松</strong>
+        </button>
+        <button class="nav-item" aria-label="报告">
+          <span class="nav-icon report"></span>
+          <strong>报告</strong>
+        </button>
+        <button class="nav-item" aria-label="我的">
+          <span class="nav-icon profile"></span>
+          <strong>我的</strong>
+        </button>
+      </nav>
+    </section>
+  </main>
+
+  <script>
+    const homeCopy = {
+      sleep: {
+        title: "准备进入陪睡模式",
+        text: "这个预览版不依赖本地服务，正式版本可跳转到睡前陪伴页面。"
+      },
+      noise: {
+        title: "推荐柔和雨声",
+        text: "雨声适合今晚的放松节奏，音量建议保持在 35%。"
+      },
+      breath: {
+        title: "做一次月亮呼吸",
+        text: "跟着光环慢慢吸气和呼气，3 分钟后再开始入睡。"
+      },
+      story: {
+        title: "今晚听云上小屋",
+        text: "故事节奏更慢，适合压力偏高或思绪停不下来时打开。"
+      }
+    };
+
+    const homeActions = document.querySelectorAll(".home-action");
+    const homeStatusTitle = document.querySelector("#homeStatusTitle");
+    const homeStatusText = document.querySelector("#homeStatusText");
+
+    homeActions.forEach((action) => {
+      action.addEventListener("click", () => {
+        const mode = action.dataset.homeMode;
+        homeActions.forEach((item) => item.classList.remove("active"));
+        action.classList.add("active");
+        homeStatusTitle.textContent = homeCopy[mode].title;
+        homeStatusText.textContent = homeCopy[mode].text;
+      });
+    });
+
+    document.querySelectorAll(".nav-item").forEach((item) => {
+      item.addEventListener("click", () => {
+        document.querySelectorAll(".nav-item").forEach((nav) => nav.classList.remove("active"));
+        item.classList.add("active");
+      });
+    });
+  </script>
+</body>
+</html>
